@@ -5,7 +5,7 @@ A full-stack web application that uses Google's Gemini API to create an active l
 
 ## Project Structure
 
-**
+```
 project-root/
 ├── client/               # Frontend React application
 │   ├── src/
@@ -22,7 +22,7 @@ project-root/
 │   ├── .env.example      # Example environment template
 │   └── package.json
 └── package.json          # Root package.json for running both services
-**
+```
 
 ## Getting Started
 
@@ -52,6 +52,6 @@ npm run dev
 The client will be available at http://localhost:5173 and the server at http://localhost:3001.
 
 ## Available Scripts
-`*` `**npm run dev**` - Start both client and server in development mode
-`*` `**npm run client**` - Start only the client
-`*` `**npm run server**` - Start only the server
+* `npm run dev` - Start both client and server in development mode
+* `npm run client` - Start only the client
+* `npm run server` - Start only the server
