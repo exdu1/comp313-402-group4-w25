@@ -37,6 +37,8 @@ cd calming-echo-app
 `2. Install dependencies:`
 ```bash
 npm run install:all
+cd client
+npm install --legacy-peer-deps
 ```
 
 `3. Configure your environment:`
@@ -55,3 +57,4 @@ The client will be available at http://localhost:5173 and the server at http://l
 * `npm run dev` - Start both client and server in development mode
 * `npm run client` - Start only the client
 * `npm run server` - Start only the server
+* `node test-gemini.js` - Test gemini api request (run in 'server' directory)
