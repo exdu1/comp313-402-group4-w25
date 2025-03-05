@@ -6,9 +6,21 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs, { appendFile } from 'fs';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Check for .env file and create if it doesn't exist
+const envPath = join(__dirname, '.env');
+if (!fs.existsSync(envPath)) {
+  fs.writeFileSync(
+    envPath,
+    'GEMINI_API_KEY=your_gemini_api_key_here\nPORT=3001\n'
+  );
+  console.log('.env file created. Please add your Gemini API key.');
+}
 
 dotenv.config();                                                // load environment variables from .env file
 
