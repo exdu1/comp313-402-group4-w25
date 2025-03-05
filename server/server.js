@@ -1,19 +1,19 @@
 // Import packages
 import express from 'express';
 import cors from 'cors';
-import axios from 'axios';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs, { appendFile } from 'fs';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import path from 'path';
+// import path from 'path';
 
+// Directory and environment setup
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// Check for .env file and create if it doesn't exist
 const envPath = join(__dirname, '.env');
+
+// Check for .env file and create it if it doesn't exist
 if (!fs.existsSync(envPath)) {
   fs.writeFileSync(
     envPath,
@@ -22,14 +22,47 @@ if (!fs.existsSync(envPath)) {
   console.log('.env file created. Please add your Gemini API key.');
 }
 
-dotenv.config();                                                // load environment variables from .env file
+dotenv.config();                                                // Load environment variables from .env file
 
-// Create the express app
-const app = express();                                          // create instance of express app
-app.use(cors());                                                // enable cross-origin requests 
-app.use(express.json());                                        // setup automatic json parsing from request bodies
+// Express app configuration
+const app = express();                                          // Create instance of express app
+app.use(cors());                                                // Enable cross-origin requests 
+app.use(express.json());                                        // Setup automatic json parsing from request bodies
+
+// Variables for the Gemini client and model
+let genAI;
+let geminiModel;
+
+/* NOTE FOR ERIC: Look into 'lazy initialization alternative to create client only when needed for first request */
+// Initialize client and model with error handling if .env file is not correctly initialized
+try {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if(!apiKey || apiKey === 'your_gemini_api_key_here') {
+    console.error('Warning: Gemini API key is not configured or is the default value.');
+  } else {
+    genAI = GoogleGenerativeAI(apiKey);
+    geminiModel = genAI.generativeModel({ model: "gemini-1.5-flash" });
+    console.log('Gemini API client successfully initialized.');
+  }
+} catch (error) {
+  console.error('Error encountered while initializing Gemini API client:', error.message);
+}
+
+/* API Endpoints */
+// Health check
+app.get('/api/test-gemini', async (req, res) => {
+
+});
+
+// Active listener
+app.post('./api/active-listener', async(req, res) => {
+
+});
+
+/* Create a prompot for Gemini to respond and act as an active listener */
+const prompt = ''
 
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`));
