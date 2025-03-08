@@ -40,8 +40,8 @@ try {
   if(!apiKey || apiKey === 'your_gemini_api_key_here') {
     console.error('Warning: Gemini API key is not configured or is the default value.');
   } else {
-    genAI = GoogleGenerativeAI(apiKey);
-    geminiModel = genAI.generativeModel({ model: "gemini-1.5-flash" });
+    genAI = new GoogleGenerativeAI(apiKey);
+    geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     console.log('Gemini API client successfully initialized.');
   }
 } catch (error) {
@@ -50,7 +50,7 @@ try {
 
 /* API ENDPOINTS */
 // Health check
-app.get('./api/heath', (res, req) => {
+app.get('/api/heath', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Backend is running',
@@ -100,7 +100,7 @@ app.get('/api/test-gemini', async (req, res) => {
 });
 
 // Active listener
-app.post('./api/active-listener', async(req, res) => {
+app.post('/api/active-listener', async(req, res) => {
   try {
     console.log('Received active-listener request:', JSON.stringify(req.body).substring(0, 100) + '...');       // Log incoming requests and truncate for readability
 
@@ -124,7 +124,7 @@ app.post('./api/active-listener', async(req, res) => {
 
     // Format conversation history for context
     let conversationContext = "";
-    if (history.lengh > 0) {
+    if (history.length > 0) {
       conversationContext = "Previous conversation:\n" + 
       history.map(msg => `${ msg.isUser ? 'User' : 'AI' }: ${ msg.text }.join('/n)`) +
       "\n\n";
@@ -149,10 +149,10 @@ app.post('./api/active-listener', async(req, res) => {
 
     // Get response
     const result = await geminiModel.generateContent(prompt);
-    const resposneText = result.resposne.text();
+    const responseText = result.response.text();
 
     // Parse the response to create a summary of the user's input and formulate a follup up question
-    const summaryMatch = resposneText.match(/SUMMARY:\s*([\s\S]*?)(?=QUESTION: |$)/i);
+    const summaryMatch = responseText.match(/SUMMARY:\s*([\s\S]*?)(?=QUESTION: |$)/i);
     const questionMatch = responseText.match(/QUESTION:\s*([\s\S]*?)(?=$)/i);
 
     const summary = summaryMatch ? summaryMatch[1].trim() : "I understand what you're saying.";
