@@ -8,7 +8,7 @@ import fs, { appendFile } from 'fs';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 // import path from 'path';
 
-// Directory and environment setup
+/* DIRECTORY AND ENVIRONMENT SETUP */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envPath = join(__dirname, '.env');
@@ -24,12 +24,12 @@ if (!fs.existsSync(envPath)) {
 
 dotenv.config();                                                // Load environment variables from .env file
 
-// Express app configuration
+/* EXPRESS CONFIGURATION */
 const app = express();                                          // Create instance of express app
 app.use(cors());                                                // Enable cross-origin requests 
 app.use(express.json());                                        // Setup automatic json parsing from request bodies
 
-// Variables for the Gemini client and model
+/* GEMINI CONFIGURATION */
 let genAI;
 let geminiModel;
 
@@ -48,16 +48,87 @@ try {
   console.error('Error encountered while initializing Gemini API client:', error.message);
 }
 
-/* API Endpoints */
+/* API ENDPOINTS */
 // Health check
-app.get('/api/test-gemini', async (req, res) => {
+app.get('./api/heath', (res, req) => {
+  res.json({
+    status: 'ok',
+    message: 'Backend is running',
+    env: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
 
+// Test endpoint for gemini key
+app.get('/api/test-gemini', async (req, res) => {
+ try {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if(!apiKey || apiKey === 'your_gemini_api_key_here') {
+    return res.status(500).json({
+      success: false,
+      message: 'Gemini API key not configured. Please add your key to the .env file'
+    });
+  }
+
+  if(!geminiModel) {
+    return res.status(500).json({
+      success: false,
+      message: 'Gemini model not initialized. Check server logs for details.'
+    });
+  }
+
+  // Test the model with a simple prompt
+  const prompt = "Respond with a simple 'API connection successful' message";
+  const result = await geminiModel.generateContent(prompt);
+  const responseText = result.response.text();
+
+  return res.json({
+    success: true,
+    message: 'Gemini API connection successful',
+    modelResponse: responseText
+  });
+
+ } catch (error) {
+  console.error('Gemini API test failed:', error.message);
+  return res.status(500).json({
+    success: false,
+    message: 'Gemini API test failed',
+    error: error.message
+  });
+ }
 });
 
 // Active listener
 app.post('./api/active-listener', async(req, res) => {
+  try {
+    console.log('Received active-listener request:', JSON.stringify(req.body).substring(0, 100) + '...');       // Log incoming requests and truncate for readability
 
-});
+    // NOTE FOR ERIC: fix redundency check for model instantiation
+    if(!geminiModel) {
+      return res.json(500).json({
+        success: false,
+        message: 'Gemini model not initialized. Check server logs for details.'
+      });
+    }
+
+    const { message, history = [] } = req.body;   // Extract message and history (if applicable) from the request body
+
+    // Validate that a message is provided
+    if(!message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message is required'
+      });
+    }
+
+    // Format conversation history for context
+    let conversationContext = "";
+    if (history.lengh > 0) {
+      conversationContext = "Previous conversation:\n" + 
+      history.map(msg => `${ msg.isUser ? 'User' : 'AI' }: ${ msg.text }.join('/n)`) +
+      "\n\n";
+    }
 
     /* Create a prompot for Gemini to respond and act as an active listener */
     const prompt = `${ conversationContext }
@@ -81,9 +152,19 @@ app.post('./api/active-listener', async(req, res) => {
     const resposneText = result.resposne.text();
 
     // Parse the response to create a summary of the user's input and formulate a follup up question
-    
+    const summaryMatch = resposneText.match(/SUMMARY:\s*([\s\S]*?)(?=QUESTION: |$)/i);
+    const questionMatch = responseText.match(/QUESTION:\s*([\s\S]*?)(?=$)/i);
 
+    const summary = summaryMatch ? summaryMatch[1].trim() : "I understand what you're saying.";
+    const question = questionMatch ? questionMatch[1].trim() : "Is there anything else you'd like to talk about?";
 
+    console.log('Response successfully generated.');
+
+    return res.json({
+      success: true,
+      summary,
+      question
+    });
 
 
   } catch (error) {
@@ -96,7 +177,7 @@ app.post('./api/active-listener', async(req, res) => {
   }
 });
 
-
+/* TBD: Deal with unhandelled GET requests */
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
