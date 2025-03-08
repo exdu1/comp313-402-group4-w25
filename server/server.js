@@ -50,7 +50,7 @@ try {
 
 /* API ENDPOINTS */
 // Health check
-app.get('/api/heath', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'Backend is running',
@@ -79,7 +79,7 @@ app.get('/api/test-gemini', async (req, res) => {
   }
 
   // Test the model with a simple prompt
-  const prompt = "Respond with a simple 'API connection successful' message";
+  const prompt = "Respond with a simple 'The API connection successful' message";
   const result = await geminiModel.generateContent(prompt);
   const responseText = result.response.text();
 
