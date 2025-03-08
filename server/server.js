@@ -59,8 +59,43 @@ app.post('./api/active-listener', async(req, res) => {
 
 });
 
-/* Create a prompot for Gemini to respond and act as an active listener */
-const prompt = ''
+    /* Create a prompot for Gemini to respond and act as an active listener */
+    const prompt = `${ conversationContext }
+    You are an Active Listener AI. Your goal is to:
+    1. Listen carefully to what the user shares
+    2. Provide a thoughtful summary that shows you understand their message
+    3. Ask a meaningful follow-up question that encourages deeper reflection
+
+    User's message: "${message}"
+
+    Respond in the following format:
+    SUMMARY: [A concise summary showing you understand what they've shared. Be empathetic and reflective.]
+    QUESTION: [A single, thoughtful follow-up question. Keep it open-ended and focused on the user's sharing.]
+
+    Maintain an empathetic tone, but keep your response concise.`;
+
+    console.log("Sending...");
+
+    // Get response
+    const result = await geminiModel.generateContent(prompt);
+    const resposneText = result.resposne.text();
+
+    // Parse the response to create a summary of the user's input and formulate a follup up question
+    
+
+
+
+
+  } catch (error) {
+    console.error('Active listener request failed:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to process message',
+      error: error.message
+    });
+  }
+});
+
 
 
 // Start express server to listen on port 3001
