@@ -1,11 +1,81 @@
+body{
+    overflow: hidden;
+}
 .homepage {
-
+    font-family: "Cormorant Garamond", serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 75vh;
+    width: 75vw;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(114, 109, 168, 0.5);
+    border: 5px solid #726DA8;
+    border-radius: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 }
 
 .hero {
+    position: relative;
+    z-index: 10;
+}
 
+.hero h1 {
+    font-size: 9rem;
+    font-weight: bold;
+    color: #f1e7e7;
+    margin-bottom: 20px;
+}
+
+.hero h2 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #bdb5b5;
+    margin-bottom: 20px;
+}
+
+.actions {
+    z-index: 10;
 }
 
 .cta-button {
+    background-color: #726DA8;
+    border: 5px solid #7D8CC4;
+    color: #BEE7E8;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1.2rem;
+    text-decoration: none;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, border 0.3s ease;
+}
 
+.cta-button:hover {
+    background-color: #7D8CC4;
+    border: 5px solid #726DA8;
+}
+
+img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    width: 150%;
+    height: auto;
+    opacity: 0.5;
+}
+
+.background-img{
+    transform: translate(-20%, -30%);
+    z-index: 0;
 }
