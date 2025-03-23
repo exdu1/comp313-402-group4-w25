@@ -164,7 +164,7 @@ app.post('/api/active-listener', async(req, res) => {
     const result = await geminiModel.generateContent(prompt);
     const responseText = result.response.text();
 
-    // Parse the response to create a summary of the user's input and formulate a follup up question
+    // Parse the response with regex to create a summary of the user's input and formulate a follup up question
     const summaryMatch = responseText.match(/SUMMARY:\s*([\s\S]*?)(?=QUESTION: |$)/i);
     const questionMatch = responseText.match(/QUESTION:\s*([\s\S]*?)(?=$)/i);
 
