@@ -126,11 +126,14 @@ app.post('/api/active-listener', async(req, res) => {
     let conversationContext = "";
     if (history.length > 0) {
       conversationContext = "Previous conversation:\n" + 
-        history.map(msg => `${msg.isUser ? 'User' : 'AI'}: ${msg.text}`).join('\n') + 
+        history.map(msg => {
+          const content = msg.isUser ? msg.message : `${msg.summary || ''}\n${msg.question || ''}`;
+          return `${msg.isUser ? 'User' : 'AI'}: ${content}`;
+        }).join('\n') + 
         "\n\n";
     }
 
-    /* Create a prompot for Gemini to respond and act as an active listener */
+    /* Create a prompt for Gemini to respond and act as an active listener */
     const prompt = `${ conversationContext }
     You are an Active Listener AI. Your goal is to:
     1. Listen carefully to what the user shares
@@ -177,6 +180,13 @@ app.post('/api/active-listener', async(req, res) => {
     });
   }
 });
+
+// Authentication
+
+// Conversations
+
+// Messages
+
 
 /* TBD: Deal with unhandelled GET requests */
 
