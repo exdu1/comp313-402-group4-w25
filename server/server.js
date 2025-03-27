@@ -70,9 +70,31 @@ connectDB();
 
 /* EXPRESS CONFIGURATION */
 const app = express();                                          // Create instance of express app
-app.use(cors());                                                // Enable cross-origin requests 
-app.use(express.json());                                        // Setup automatic json parsing from request bodies
+app.use(helmet());                                              // Set security HTTP headers
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));               
 
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later'
+});
+app.use('/api', limiter);
+
+// Logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Body parser
+app.use(express.json({ limit: '10kb' })); // Setup automatic json parsing from request bodies
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Cookie parser
+app.use(cookieParser());
 
 /* API ENDPOINTS */
 // Health check
@@ -130,13 +152,6 @@ app.post('/api/active-listener', async(req, res) => {
   try {
     console.log('Received active-listener request:', JSON.stringify(req.body).substring(0, 100) + '...');       // Log incoming requests and truncate for readability
 
-    // NOTE FOR ERIC: fix redundency check for model instantiation
-    if(!geminiModel) {
-      return res.json(500).json({
-        success: false,
-        message: 'Gemini model not initialized. Check server logs for details.'
-      });
-    }
 
     const { message, history = [] } = req.body;   // Extract message and history (if applicable) from the request body
 
@@ -149,50 +164,22 @@ app.post('/api/active-listener', async(req, res) => {
     }
 
     // Format conversation history for context
-    let conversationContext = "";
-    if (history.length > 0) {
-      conversationContext = "Previous conversation:\n" + 
-        history.map(msg => {
-          const content = msg.isUser ? msg.message : `${msg.summary || ''}\n${msg.question || ''}`;
-          return `${msg.isUser ? 'User' : 'AI'}: ${content}`;
-        }).join('\n') + 
-        "\n\n";
-    }
+    const formattedHistory = history.map(msg => ({
+      content: msg.message || '',
+      summary: msg.summary || '',
+      question: msg.question || '',
+      isUser: msg.isUser
+    }));
+    
+    const response = result.response.text();
 
-    /* Create a prompt for Gemini to respond and act as an active listener */
-    const prompt = `${ conversationContext }
-    You are an Active Listener AI. Your goal is to:
-    1. Listen carefully to what the user shares
-    2. Provide a thoughtful summary that shows you understand their message
-    3. Ask a meaningful follow-up question that encourages deeper reflection
-
-    User's message: "${message}"
-
-    Respond in the following format:
-    SUMMARY: [A concise summary showing you understand what they've shared. Be empathetic and reflective.]
-    QUESTION: [A single, thoughtful follow-up question. Keep it open-ended and focused on the user's sharing.]
-
-    Maintain an empathetic tone, but keep your response concise.`;
-
-    //console.log(prompt);
-
-    // Get response
-    const result = await geminiModel.generateContent(prompt);
-    const responseText = result.response.text();
-
-    // Parse the response with regex to create a summary of the user's input and formulate a follup up question
-    const summaryMatch = responseText.match(/SUMMARY:\s*([\s\S]*?)(?=QUESTION: |$)/i);
-    const questionMatch = responseText.match(/QUESTION:\s*([\s\S]*?)(?=$)/i);
-
-    const summary = summaryMatch ? summaryMatch[1].trim() : "I understand what you're saying.";
-    const question = questionMatch ? questionMatch[1].trim() : "Is there anything else you'd like to talk about?";
-
-    console.log('Response successfully generated.');
+    console.log('Response successfully generated');
 
     return res.json({
       success: true,
-      summary,
-      question, 
+      message: response.message,
+      summary: response.summary,
+      question: response.question, 
       isUser: false
     });
 
@@ -207,15 +194,32 @@ app.post('/api/active-listener', async(req, res) => {
   }
 });
 
-// Authentication
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/conversations', conversationRoutes);
 
-// Conversations
+// Handle 404 errors
+app.use('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Cannot find ${req.originalUrl} on this server`
+  });
+});
 
-// Messages
+// Error handling middleware
+app.use(errorHandler);
 
-
-/* TBD: Deal with unhandelled GET requests */
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV || 'development'} mode`)); 
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION! Shutting down...');
+  console.error(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+});

@@ -30,6 +30,15 @@ export const generateAIResponse = async (message, history) => {
         }).join("\n") + "\n\n";
     }
 
+    // if (history.length > 0) {
+    //   conversationContext = "Previous conversation:\n" + 
+    //     history.map(msg => {
+    //       const content = msg.isUser ? msg.message : `${msg.summary || ''}\n${msg.question || ''}`;
+    //       return `${msg.isUser ? 'User' : 'AI'}: ${content}`;
+    //     }).join('\n') + 
+    //     "\n\n";
+    // }
+
     // Create prompt for Gemini
     const prompt = `${conversationContext}
       You are an Active Listener AI. Your goal is to:

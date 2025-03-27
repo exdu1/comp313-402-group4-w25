@@ -23,7 +23,6 @@ dotenv.config();
 // };
 
 // Implementation Step 2: DB connection
-import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {

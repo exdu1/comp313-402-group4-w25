@@ -1,0 +1,185 @@
+/* client/src/routes/dashboard/dashboard.css */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f7f7f7;
+  min-height: 100vh;
+  color: #333;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+  font-size: 1.8rem;
+  color: #726DA8;
+  margin: 0;
+}
+
+.new-conversation-btn {
+  background-color: #726DA8;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.new-conversation-btn:hover {
+  background-color: #5a4b8d;
+}
+
+.error-alert {
+  background-color: #ffebee;
+  color: #f44336;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conversation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.conversation-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.conversation-item.active {
+  border-left: 4px solid #726DA8;
+  background-color: #f0f0f9;
+}
+
+.conversation-title {
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+}
+
+.conversation-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.conversation-actions button {
+  background: none;
+  border: none;
+  color: #726DA8;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.2s;
+  font-size: 0.9rem;
+}
+
+.conversation-actions button:hover {
+  color: #5a4b8d;
+  text-decoration: underline;
+}
+
+.rename-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.rename-form input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.rename-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.rename-actions button {
+  background-color: #726DA8;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.rename-actions button:last-child {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.no-conversations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background-color: white;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.no-conversations p {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.no-conversations button {
+  background-color: #726DA8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.no-conversations button:hover {
+  background-color: #5a4b8d;
+}
+
+.dashboard.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid #726DA8;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

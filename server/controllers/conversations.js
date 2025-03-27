@@ -59,6 +59,78 @@ export const getConversation = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Update conversation details (rename)
+// @route   PUT /api/conversations/:id
+// @access  Private
+export const updateConversation = asyncHandler(async (req, res, next) => {
+  let conversation = await Conversation.findById(req.params.id);
+
+  if (!conversation) {
+    return next(
+      new ErrorResponse(`Conversation not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure user owns the conversation
+  if (conversation.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(`User not authorized to update this conversation`, 401)
+    );
+  }
+
+  // Only allow title and isArchived to be updated
+  const { title, isArchived } = req.body;
+  const updateData = {};
+  
+  if (title) updateData.title = title;
+  if (isArchived !== undefined) updateData.isArchived = isArchived;
+
+  conversation = await Conversation.findByIdAndUpdate(
+    req.params.id,
+    updateData,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  res.status(200).json({
+    success: true,
+    data: conversation
+  });
+});
+
+// @desc    Delete conversation
+// @route   DELETE /api/conversations/:id
+// @access  Private
+export const deleteConversation = asyncHandler(async (req, res, next) => {
+  const conversation = await Conversation.findById(req.params.id);
+
+  if (!conversation) {
+    return next(
+      new ErrorResponse(`Conversation not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  // Make sure user owns the conversation
+  if (conversation.user.toString() !== req.user.id) {
+    return next(
+      new ErrorResponse(`User not authorized to delete this conversation`, 401)
+    );
+  }
+
+  // Delete all messages associated with the conversation
+  await Message.deleteMany({ conversation: req.params.id });
+  
+  // Delete the conversation
+  await conversation.deleteOne();
+
+  res.status(200).json({
+    success: true,
+    data: {}
+  });
+});
+
 // @desc    Get messages for a conversation
 // @route   GET /api/conversations/:id/messages
 // @access  Private

@@ -91,6 +91,60 @@ export const AuthProvider = ({ children }) => {
     window.location.href = 'http://localhost:3001/api/auth/google';
   };
 
+  // Microsoft login
+  const microsoftLogin = () => {
+    window.location.href = 'http://localhost:3001/api/auth/microsoft';
+  };
+
+  // Reset password request
+  const forgotPassword = async (email) => {
+    try {
+      setError(null);
+      const res = await axios.post('http://localhost:3001/api/auth/forgot-password', { email });
+      
+      return { success: true, message: res.data.message };
+    } catch (error) {
+      setError(error.response?.data?.error || 'Error sending password reset email');
+      return { success: false, message: error.response?.data?.error || 'Error sending password reset email' };
+    }
+  };
+
+  // Reset password with token
+  const resetPassword = async (password, token) => {
+    try {
+      setError(null);
+      const res = await axios.put(`http://localhost:3001/api/auth/reset-password/${token}`, { password });
+      
+      return { success: true, message: res.data.message };
+    } catch (error) {
+      setError(error.response?.data?.error || 'Error resetting password');
+      return { success: false, message: error.response?.data?.error || 'Error resetting password' };
+    }
+  };
+
+   // Update user profile
+   const updateProfile = async (userData) => {
+    try {
+      setError(null);
+      const res = await axios.put('http://localhost:3001/api/users/me', userData, {
+        withCredentials: true
+      });
+      
+      if (res.data.success) {
+        setUser({...user, ...res.data.data});
+        return { success: true, message: 'Profile updated successfully' };
+      }
+    } catch (error) {
+      setError(error.response?.data?.error || 'Error updating profile');
+      return { success: false, message: error.response?.data?.error || 'Error updating profile' };
+    }
+  };
+
+  // Clear errors
+   const clearErrors = () => {
+    setError(null);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -101,10 +155,17 @@ export const AuthProvider = ({ children }) => {
         register,
         login,
         logout,
-        googleLogin
+        googleLogin,
+        microsoftLogin,
+        forgotPassword,
+        resetPassword,
+        updateProfile,
+        clearErrors
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;
