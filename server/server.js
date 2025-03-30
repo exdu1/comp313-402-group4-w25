@@ -134,24 +134,11 @@ app.post('/api/active-listener', async(req, res) => {
 
     // Format conversation history for context
     let conversationContext = "";
-    conversationContext = "Previous conversation:\n" +
-      history.map(msg => {
-          let messageString = "";
-          
-          if (msg.message) {
-              messageString += `Message: ${msg.message}\n`;
-          }
-  
-          if (msg.summary) {
-              messageString += `Summary: ${msg.summary}\n`;
-          }
-  
-          if (msg.question) {
-              messageString += `Question: ${msg.question}\n`;
-          }
-  
-          return `${msg.isUser ? 'User' : 'AI'}:\n${messageString}`;
-      }).join("\n") + "\n\n"
+    if (history.length > 0) {
+      conversationContext = "Previous conversation:\n" + 
+        history.map(msg => `${msg.isUser ? 'User' : 'AI'}: ${msg.text}`).join('\n') + 
+        "\n\n";
+    }
 
     /* Create a prompot for Gemini to respond and act as an active listener */
     const prompt = `${ conversationContext }
@@ -168,7 +155,7 @@ app.post('/api/active-listener', async(req, res) => {
 
     Maintain an empathetic tone, but keep your response concise.`;
 
-    console.log(prompt);
+    console.log(message);
 
     // Get response
     const result = await geminiModel.generateContent(prompt);
