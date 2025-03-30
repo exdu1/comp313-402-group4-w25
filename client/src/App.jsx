@@ -24,14 +24,14 @@ const App = () => {
                             </ProtectedRoute>
                         } 
                     />
-                    {/* <Route 
+                    <Route 
                         path="/dashboard" 
                         element={
                             <ProtectedRoute>
                                 <Dashboard />
                             </ProtectedRoute>
                         } 
-                    /> */}
+                    />
                     <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
             </BrowserRouter>

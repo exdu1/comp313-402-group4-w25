@@ -46,6 +46,25 @@ REDIRECT_URL=http://localhost:3001/api/auth/google/callback
 
 dotenv.config();                                                // Load environment variables from .env file
 
+// Add this code for proper Gemini initialization
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Initialize the Gemini model
+let geminiModel;
+try {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (apiKey && apiKey !== 'your_gemini_api_key_here') {
+    console.log('Initializing Gemini model...');
+    const genAI = new GoogleGenerativeAI(apiKey);
+    geminiModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log('Gemini model initialized successfully');
+  } else {
+    console.error('WARNING: Gemini API key not configured properly');
+  }
+} catch (error) {
+  console.error('Failed to initialize Gemini model:', error.message);
+}
+
 // Validate required environment variables
 const requiredEnvVars = [
   'GEMINI_API_KEY',

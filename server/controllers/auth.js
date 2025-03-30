@@ -189,3 +189,150 @@ const sendTokenResponse = (user, statusCode, res, isNewUser = false) => {
       }
     });
 };
+
+// Additional functions for server/controllers/auth.js
+
+// @desc    Get current user
+// @route   GET /api/auth/me
+// @access  Private
+export const getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      id: user._id,
+      email: user.email,
+      displayName: user.displayName,
+      emailVerified: user.emailVerified,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin
+    }
+  });
+});
+
+// @desc    Forgot password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return next(new ErrorResponse('No account with that email exists', 404));
+  }
+
+  // Get reset token
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  // Create reset url
+  const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+
+  const message = `You are receiving this email because you (or someone else) has requested to reset your password. Please visit: ${resetUrl} to set a new password. If you did not request this, please ignore this email.`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Token',
+      message
+    });
+
+    res.status(200).json({ success: true, message: 'Email sent' });
+  } catch (err) {
+    console.error(err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse('Email could not be sent', 500));
+  }
+});
+
+// @desc    Reset password
+// @route   PUT /api/auth/reset-password/:resetToken
+// @access  Public
+export const resetPassword = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resetToken)
+    .digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid or expired token', 400));
+  }
+
+  // Set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
+});
+
+// @desc    Verify email
+// @route   GET /api/auth/verify-email/:verificationToken
+// @access  Public
+export const verifyEmail = asyncHandler(async (req, res, next) => {
+  // Get hashed token
+  const verificationToken = crypto
+    .createHash('sha256')
+    .update(req.params.verificationToken)
+    .digest('hex');
+
+  const user = await User.findOne({
+    verificationToken,
+    verificationExpire: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new ErrorResponse('Invalid or expired token', 400));
+  }
+
+  // Set email as verified
+  user.emailVerified = true;
+  user.verificationToken = undefined;
+  user.verificationExpire = undefined;
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Email verified successfully'
+  });
+});
+
+// @desc    Refresh token
+// @route   POST /api/auth/refresh-token
+// @access  Public
+export const refreshToken = asyncHandler(async (req, res, next) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return next(new ErrorResponse('No refresh token provided', 400));
+  }
+
+  try {
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    
+    // Find user
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+    
+    // Generate new token
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    return next(new ErrorResponse('Invalid refresh token', 401));
+  }
+});
