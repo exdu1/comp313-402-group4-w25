@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs, { appendFile } from 'fs';
 import { GoogleGenerativeAI } from "@google/generative-ai";
-// import path from 'path';
+import mongoose from 'mongoose';
+import connectDB from './config/db.js';
 
 /* DIRECTORY AND ENVIRONMENT SETUP */
 const __filename = fileURLToPath(import.meta.url);
@@ -17,12 +18,21 @@ const envPath = join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
   fs.writeFileSync(
     envPath,
-    'GEMINI_API_KEY=your_gemini_api_key_here\nPORT=3001\n'
+    'GEMINI_API_KEY=your_gemini_api_key_here\nPORT=3001\nMONGODB_URI=mongodb+srv://username:password@cluster0.example.mongodb.net/database_name?retryWrites=true&w=majority\n'
   );
   console.log('.env file created. Please add your Gemini API key.');
 }
 
 dotenv.config();                                                // Load environment variables from .env file
+
+// Connect to MongoDB
+connectDB()
+  .then(() => {
+    console.log('MongoDB connection test successful');
+  })
+  .catch(err => {
+    console.error('MongoDB connection test failed:', err.message);
+  });
 
 /* EXPRESS CONFIGURATION */
 const app = express();                                          // Create instance of express app
@@ -124,24 +134,11 @@ app.post('/api/active-listener', async(req, res) => {
 
     // Format conversation history for context
     let conversationContext = "";
-    conversationContext = "Previous conversation:\n" +
-      history.map(msg => {
-          let messageString = "";
-          
-          if (msg.message) {
-              messageString += `Message: ${msg.message}\n`;
-          }
-  
-          if (msg.summary) {
-              messageString += `Summary: ${msg.summary}\n`;
-          }
-  
-          if (msg.question) {
-              messageString += `Question: ${msg.question}\n`;
-          }
-  
-          return `${msg.isUser ? 'User' : 'AI'}:\n${messageString}`;
-      }).join("\n") + "\n\n"
+    if (history.length > 0) {
+      conversationContext = "Previous conversation:\n" + 
+        history.map(msg => `${msg.isUser ? 'User' : 'AI'}: ${msg.text}`).join('\n') + 
+        "\n\n";
+    }
 
     /* Create a prompot for Gemini to respond and act as an active listener */
     const prompt = `${ conversationContext }
@@ -158,7 +155,7 @@ app.post('/api/active-listener', async(req, res) => {
 
     Maintain an empathetic tone, but keep your response concise.`;
 
-    console.log(prompt);
+    console.log(message);
 
     // Get response
     const result = await geminiModel.generateContent(prompt);
@@ -191,7 +188,20 @@ app.post('/api/active-listener', async(req, res) => {
   }
 });
 
-/* TBD: Deal with unhandelled GET requests */
+// DB connection test endpoint
+app.get('/api/db-test', (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+  
+  res.json({
+    success: true,
+    connection_status: isConnected ? 'connected' : 'disconnected',
+    database_name: mongoose.connection.name || 'not connected',
+    connection_details: {
+      host: mongoose.connection.host || 'not connected',
+      port: mongoose.connection.port || 'not connected'
+    }
+  });
+});
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
