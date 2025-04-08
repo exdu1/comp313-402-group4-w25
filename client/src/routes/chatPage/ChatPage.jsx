@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Sidebar from '../../components/Sidebar';
 import './chatPage.css'
 
 const ChatPage = () => {
@@ -51,6 +52,7 @@ const ChatPage = () => {
 
     return (
         <div className="chat-page">
+            <Sidebar></Sidebar>
             <div className="chat-container">
                 <div className="chat-header">
                     <h2>Calming Echo Active Listener</h2>
@@ -70,7 +72,7 @@ const ChatPage = () => {
 
                 <form className="input-container" onSubmit={handleSubmit}>
                     <input type='text' onChange={handleChange} value={message}/>
-                    <input type='submit' />
+                    <input type='submit' value="✔️"/>
                 </form>
             </div>
         </div>
