@@ -9,7 +9,6 @@
 
 .chat-container {
     flex: 1;
-    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -17,10 +16,14 @@
 
 .chat-header {
     background-color: #726DA8;
+    position: fixed;
+    top: 0;
+    margin: 0px;
+    width: 100%;
     color: white;
     padding: 20px;
     text-align: center;
-    border-radius: 8px 8px 0 0;
+    z-index: 1;
 }
 
 .messages-container {
@@ -39,19 +42,19 @@
 .user-message {
     padding: 10px;
     border-radius: 10px;
-    max-width: 80%; /* Controls the width of the message box */
-    word-wrap: break-word; /* Ensures long words break and wrap */
+    max-width: 80%; 
+    word-wrap: break-word; 
     margin-bottom: 10px;
 }
 
 .ai-message {
     background-color: #A0D2DB;
-    align-self: flex-start; /* Align AI message to the left */
+    align-self: flex-start; 
 }
 
 .user-message {
     background-color: #BEE7E8;
-    align-self: flex-end; /* Align User message to the right */
+    align-self: flex-end; 
 }
 
 .input-container {
