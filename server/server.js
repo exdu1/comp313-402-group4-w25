@@ -8,6 +8,7 @@ import fs, { appendFile } from 'fs';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
 
 /* DIRECTORY AND ENVIRONMENT SETUP */
 const __filename = fileURLToPath(import.meta.url);
@@ -202,6 +203,9 @@ app.get('/api/db-test', (req, res) => {
     }
   });
 });
+
+// Auth routes
+app.use('/api', authRoutes);
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
