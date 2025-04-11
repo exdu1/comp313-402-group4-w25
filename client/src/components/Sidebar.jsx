@@ -2,8 +2,13 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import "./Sidebar.css"; 
 
-const Sidebar = () => {
+const Sidebar = ({ history, onLoadConversation }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleClick = (id) => {
+    onLoadConversation(id); // this calls the function passed down from ChatPage
+    setIsOpen(false); // optionally close sidebar after click
+  };
 
   return (
     <>
@@ -14,9 +19,17 @@ const Sidebar = () => {
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <h2>HISTORY</h2>
         <ul>
-          <li>Home</li>
-          <li>About</li>
-          <li>Contact</li>
+          {history && history.length > 0 ? (
+            history.map((conversation) => (
+              <li key={conversation._id}>
+                <button className="history-btn" value={conversation._id} onClick={() => handleClick(conversation._id)}>
+                  {conversation._id}
+                </button>
+              </li>
+            ))
+          ) : (
+            <li>No conversation history found.</li>
+          )}
         </ul>
       </div>
 
