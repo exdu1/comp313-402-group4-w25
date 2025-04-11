@@ -6,8 +6,8 @@ const Sidebar = ({ history, onLoadConversation }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = (id) => {
-    onLoadConversation(id); // this calls the function passed down from ChatPage
-    setIsOpen(false); // optionally close sidebar after click
+    onLoadConversation(id); 
+    setIsOpen(false); 
   };
 
   return (

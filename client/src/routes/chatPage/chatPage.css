@@ -8,9 +8,9 @@
 
 .chat-container {
     flex: 1;
-    margin-top: 100px; /* height of header */
-    margin-bottom: 70px; /* height of input */
-    overflow-y: hidden; /* prevent whole page from scrolling */
+    margin-top: 100px; 
+    margin-bottom: 70px; 
+    overflow-y: hidden; 
     display: flex;
     flex-direction: column;
     position: relative;
