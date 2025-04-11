@@ -45,12 +45,12 @@
 }
 
 .ai-message {
-    background-color: #A0D2DB;
+    background-color: #1cafc9;
     align-self: flex-start; /* Align AI message to the left */
 }
 
 .user-message {
-    background-color: #BEE7E8;
+    background-color: #4b86d3;
     align-self: flex-end; /* Align User message to the right */
 }
 
