@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import apiConfig from '../../config/api';
 import './signUpPage.css';
 
 const SignUpPage = () => {
@@ -11,7 +12,7 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:3001/api/signup', {
+      const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.signup}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
