@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import './chatPage.css'
 
+
 const ChatPage = () => {
     const [message, setMessage] = useState("");
     const [history, setHistory] = useState([]);
@@ -54,37 +55,43 @@ const ChatPage = () => {
         } catch (err) {
             console.error("Error loading conversation by ID:", err);
         }
+
+
+    const getTimeStamp = () => {
+        return new Date().toLocaleTimeString(); // Formats time as HH:MM:SS AM/PM
+
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+
         let conversationId = localStorage.getItem('conversation')
         const token = localStorage.getItem('token');
 
-        setHistory(prevHistory => [
-            ...prevHistory,
-            { message: message, isUser: true }
-        ]);
+        if (!message.trim()) return; // Prevents sending empty messages
+
+        const userMessage = {
+            message: message,
+            isUser: true,
+            timestamp: getTimeStamp()
+        };
+
+        setHistory(prevHistory => [...prevHistory, userMessage]);
+        setMessage(""); // Clears input field
 
         try {
             const response = await fetch('http://localhost:3001/api/active-listener', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: message,
-                    history: history,
-                    isUser: true
-                }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message, history, isUser: true }),
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
 
             const reply = await response.json();
+            reply.timestamp = getTimeStamp(); // Adds timestamp to AI response
+
 
             setHistory(prevHistory => [
                 ...prevHistory,
@@ -121,14 +128,22 @@ const ChatPage = () => {
                     conversationId: conversationId
                 }),
             })
+
         } catch (error) {
             console.error('Error during fetch request:', error);
         }
-    }
+    };
 
     const handleChange = (e) => {
         setMessage(e.target.value);
-    }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevents new line
+            handleSubmit(e);
+        }
+    };
 
     return (
         <div className="chat-page">
@@ -143,16 +158,24 @@ const ChatPage = () => {
                     {history.map((entry, index) => (
                         <div key={index} className={entry.sender == 'user' ? 'user-message' : 'ai-message'}>
                             <p>{entry.message}</p>
-                            <p>{entry.summary}</p>
-                            <br />
-                            <p>{entry.question}</p>
+                            {entry.summary && <p>{entry.summary}</p>}
+                            {entry.question && <p>{entry.question}</p>}
+                            <small className="timestamp">{entry.timestamp}</small>
                         </div>
                     ))}
                 </div>
 
                 <form className="input-container" onSubmit={handleSubmit}>
-                    <input type='text' onChange={handleChange} value={message} />
+
+                    <input 
+                        type='text' 
+                        onChange={handleChange} 
+                        onKeyDown={handleKeyDown} 
+                        value={message} 
+                        placeholder="Type a message..."
+                    />
                     <input type='submit' value="✔️" />
+
                 </form>
             </div>
         </div>

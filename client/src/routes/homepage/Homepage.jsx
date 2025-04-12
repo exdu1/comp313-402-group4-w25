@@ -15,15 +15,21 @@ const Homepage = () => {
     }
   };
 
+  // Handler for signing out
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
   return (
     <>
       <img src="../../../CalmBoat.jpg" alt="Calm Boat" className="background-img" />
       <div className="homepage">
-        {/* Top right sign in / signed in button */}
+        {/* Top right sign in / sign out button */}
         <div className="top-right">
           {token ? (
-            <button className="top-button" disabled>
-              Signed in
+            <button onClick={handleSignOut} className="top-button">
+              Sign Out
             </button>
           ) : (
             <Link to="/signin" className="top-button">

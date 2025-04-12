@@ -49,13 +49,14 @@
 }
 
 .ai-message {
-    background-color: #A0D2DB;
-    align-self: flex-start; 
+
+    background-color: #1cafc9;
+    align-self: flex-start; /* Align AI message to the left */
 }
 
 .user-message {
-    background-color: #BEE7E8;
-    align-self: flex-end; 
+    background-color: #4b86d3;
+    align-self: flex-end; /* Align User message to the right */
 }
 
 .input-container {

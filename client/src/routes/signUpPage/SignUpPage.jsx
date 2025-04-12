@@ -63,6 +63,10 @@ const SignUpPage = () => {
           <p>Already signed up? Please Sign in!</p>
           <Link to="/signin" className="signin-button">Sign In</Link>
         </div>
+        <div className="signup-prompt">
+          <p>Don't want an account? Continue as guest!</p>
+          <Link to="/chat" className="signup-button">Continue as Guest</Link>
+        </div>        
       </div>
     </div>
   );
