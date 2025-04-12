@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
-import './chatPage.css'
-
+import './chatPage.css';
 
 const ChatPage = () => {
     const [message, setMessage] = useState("");
     const [history, setHistory] = useState([]);
-    const [allConversations, setAllConversations] = useState([]); 
+    const [allConversations, setAllConversations] = useState([]);
 
     useEffect(() => {
-        localStorage.setItem('conversation', null );
+        localStorage.setItem('conversation', null);
         const fetchHistory = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -36,37 +35,35 @@ const ChatPage = () => {
 
     const loadConversationById = async (conversationId) => {
         try {
-            localStorage.setItem('conversation', conversationId );
+            localStorage.setItem('conversation', conversationId);
             const token = localStorage.getItem('token');
 
-            const response = await fetch(`http://localhost:3001/api/pullHistoryById/${conversationId}`,{
+            const response = await fetch(`http://localhost:3001/api/pullHistoryById/${conversationId}`, {
                 method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    }
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                }
             });
 
             if (!response.ok) throw new Error('Failed to fetch conversation');
 
             const data = await response.json();
-            console.log("HERE IS THE CONVERSATION I FOUND: " + JSON.stringify(data))
+            console.log("HERE IS THE CONVERSATION I FOUND: " + JSON.stringify(data));
             setHistory(data.history);
         } catch (err) {
             console.error("Error loading conversation by ID:", err);
         }
-
+    };
 
     const getTimeStamp = () => {
         return new Date().toLocaleTimeString(); // Formats time as HH:MM:SS AM/PM
-
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-
-        let conversationId = localStorage.getItem('conversation')
+        let conversationId = localStorage.getItem('conversation');
         const token = localStorage.getItem('token');
 
         if (!message.trim()) return; // Prevents sending empty messages
@@ -92,7 +89,6 @@ const ChatPage = () => {
             const reply = await response.json();
             reply.timestamp = getTimeStamp(); // Adds timestamp to AI response
 
-
             setHistory(prevHistory => [
                 ...prevHistory,
                 reply
@@ -109,11 +105,11 @@ const ChatPage = () => {
                     message: message, 
                     conversationId: conversationId
                 }),
-            })
-            const saveUserHistory = await saveUserHistoryResponse.json()
-            console.log("HERE IS THE SAVED USER CONVERSAION " + JSON.stringify(saveUserHistory))
+            });
+            const saveUserHistory = await saveUserHistoryResponse.json();
+            console.log("HERE IS THE SAVED USER CONVERSAION " + JSON.stringify(saveUserHistory));
             if(conversationId === 'null'){
-                conversationId = saveUserHistory._id
+                conversationId = saveUserHistory._id;
             }
 
             const saveBotHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
@@ -127,8 +123,7 @@ const ChatPage = () => {
                     message: reply.summary + "\n" + reply.question,  
                     conversationId: conversationId
                 }),
-            })
-
+            });
         } catch (error) {
             console.error('Error during fetch request:', error);
         }
@@ -166,7 +161,6 @@ const ChatPage = () => {
                 </div>
 
                 <form className="input-container" onSubmit={handleSubmit}>
-
                     <input 
                         type='text' 
                         onChange={handleChange} 
@@ -175,7 +169,6 @@ const ChatPage = () => {
                         placeholder="Type a message..."
                     />
                     <input type='submit' value="✔️" />
-
                 </form>
             </div>
         </div>
