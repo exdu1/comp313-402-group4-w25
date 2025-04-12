@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
+import apiConfig from '../../config/api';
 import './chatPage.css';
 
 const ChatPage = () => {
@@ -13,7 +14,7 @@ const ChatPage = () => {
             try {
                 const token = localStorage.getItem('token');
 
-                const response = await fetch('http://localhost:3001/api/pullHistoryByUser', {
+                const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryByUser}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -38,7 +39,7 @@ const ChatPage = () => {
             localStorage.setItem('conversation', conversationId);
             const token = localStorage.getItem('token');
 
-            const response = await fetch(`http://localhost:3001/api/pullHistoryById/${conversationId}`, {
+            const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryById(conversationId)}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -78,7 +79,7 @@ const ChatPage = () => {
         setMessage(""); // Clears input field
 
         try {
-            const response = await fetch('http://localhost:3001/api/active-listener', {
+            const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.activeListener}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message, history, isUser: true }),
@@ -94,7 +95,7 @@ const ChatPage = () => {
                 reply
             ]);
 
-            const saveUserHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            const saveUserHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -112,7 +113,7 @@ const ChatPage = () => {
                 conversationId = saveUserHistory._id;
             }
 
-            const saveBotHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            const saveBotHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

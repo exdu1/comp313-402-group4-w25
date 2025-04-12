@@ -38,14 +38,23 @@ connectDB()
 
 /* EXPRESS CONFIGURATION */
 const app = express();                                          // Create instance of express app
-app.use(cors());                                                // Enable cross-origin requests 
+
+// Configure CORS for different environment
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+  ? ['https://calming-echo-web.onrender.com']
+  : ['http://localhost:5173', 'http://localhost:4173'],
+  credentials: true,
+  optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions));                                                // Enable cross-origin requests 
 app.use(express.json());                                        // Setup automatic json parsing from request bodies
 
 /* GEMINI CONFIGURATION */
 let genAI;
 let geminiModel;
 
-/* NOTE FOR ERIC: Look into 'lazy initialization alternative to create client only when needed for first request */
 // Initialize client and model with error handling if .env file is not correctly initialized
 try {
   const apiKey = process.env.GEMINI_API_KEY;
