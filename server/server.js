@@ -41,13 +41,13 @@ connectDB()
 const app = express();                                          // Create instance of express app
 
 // Configure CORS for different environment
-const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? true // Allow same-origin requests
-    : ['http://localhost:5173', 'http://localhost:4173'],
-  credentials: true,
-  optionsSuccessStatus: 200
-}
+// const corsOptions = {
+//   origin: process.env.NODE_ENV === 'production'
+//     ? true // Allow same-origin requests
+//     : ['http://localhost:5173', 'http://localhost:4173'],
+//   credentials: true,
+//   optionsSuccessStatus: 200
+// }
 
 app.use(cors(corsOptions));                                                // Enable cross-origin requests 
 app.use(express.json());                                        // Setup automatic json parsing from request bodies
@@ -225,6 +225,8 @@ app.use('/api', conversationRoutes)
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React build
   const clientBuildPath = path.join(__dirname, '../client/dist');
+  console.log(`Serving static files from: ${clientBuildPath}`);
+
   app.use(express.static(clientBuildPath));
   
   // For any request not handled by the API, send the React app

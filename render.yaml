@@ -1,15 +1,35 @@
 services:
+  # Backend API service
   - type: web
-    name: calming-echo
+    name: calming-echo-api
     env: node
-    buildCommand: npm install --legacy-peer-deps && npm install -g vite && cd client && npm install --legacy-peer-deps && npm run build && cd ..
-    startCommand: npm start
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
         sync: false
+      - key: PORT
+        value: 3000
       - key: JWT_SECRET
         sync: false
       - key: GEMINI_API_KEY
-        sync: false
+        sync: 
+        
+    # Frontend service as a web service that serves static files
+  - type: web
+    name: calming-echo-client
+    buildCommand: cd client && npm install --legacy-peer-deps && npm run build
+    staticPublishPath: ./client/dist
+    runtime: static
+    routes:
+    - type: rewrite
+      source: /*
+      destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: calming-echo-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL

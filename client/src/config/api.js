@@ -1,10 +1,3 @@
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? '' // Empty string for same-origin requests in production
-  : 'http://localhost:3001'; 
+const API_URL = '/api';
 
-export default {
-  baseURL: API_URL,
-  endpoints: {
-    // Keep your existing endpoints
-  }
-};
+export default API_URL;
