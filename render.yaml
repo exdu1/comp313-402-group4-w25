@@ -3,7 +3,12 @@ services:
   - type: web
     name: calming-echo-api
     env: node
-    buildCommand: npm run install:all
+    buildCommand: |
+      npm install
+      cd server
+      npm install
+      cd ../client
+      npm install --legacy-peer-deps
     startCommand: cd server && npm run start
     envVars:
       - key: NODE_ENV
