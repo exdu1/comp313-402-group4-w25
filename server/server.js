@@ -49,7 +49,7 @@ const app = express();                                          // Create instan
 //   optionsSuccessStatus: 200
 // }
 
-app.use(cors(corsOptions));                                                // Enable cross-origin requests 
+app.use(cors());                                                // Enable cross-origin requests 
 app.use(express.json());                                        // Setup automatic json parsing from request bodies
 
 /* GEMINI CONFIGURATION */
