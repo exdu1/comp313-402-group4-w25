@@ -12,6 +12,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.1",
     "axios": "^1.7.9",
+    "lucide-react": "^0.485.0",
     "react": "19.0.0-rc-8b08e99e-20240713",
     "react-dom": "19.0.0-rc-8b08e99e-20240713",
     "react-router-dom": "^7.2.0",

@@ -6,8 +6,15 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      external: [], // Explicitly empty to ensure no unintended externalization
+    }
   },
-  // Add this to help diagnose any build issues
+  resolve: {
+    alias: {
+      'lucide-react': 'lucide-react' // Explicit resolution for lucide-react
+    }
+  },
   server: {
     port: 5173
   }
