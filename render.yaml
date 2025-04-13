@@ -1,9 +1,8 @@
 services:
-  # Single service deployment
   - type: web
     name: calming-echo
     env: node
-    buildCommand: npm install && npm run build:client
+    buildCommand: npm install && npm install -g vite && cd client && npm install && npm run build && cd ..
     startCommand: npm start
     envVars:
       - key: NODE_ENV

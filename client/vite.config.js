@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -12,6 +11,8 @@ export default defineConfig({
     port: 4173,
     host: true
   },
+  // Explicitly set the base directory for production
+  base: '/',
   // For environment variable handling
   define: {
     'process.env': {}
