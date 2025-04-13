@@ -222,18 +222,18 @@ app.use('/api', authRoutes);
 // Conversation routes
 app.use('/api', conversationRoutes)
 
-// if (process.env.NODE_ENV === 'production') {
-//   // Serve static files from the React build
-//   const clientBuildPath = path.join(__dirname, '../client/dist');
-//   console.log(`Serving static files from: ${clientBuildPath}`);
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React build
+  const clientBuildPath = path.join(__dirname, '../client/dist');
+  console.log(`Serving static files from: ${clientBuildPath}`);
 
-//   app.use(express.static(clientBuildPath));
+  app.use(express.static(clientBuildPath));
   
-//   // For any request not handled by the API, send the React app
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(clientBuildPath, 'index.html'));
-//   });
-// }
+  // For any request not handled by the API, send the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;
