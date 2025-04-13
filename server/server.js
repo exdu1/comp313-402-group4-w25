@@ -10,6 +10,7 @@ import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import conversationRoutes from './routes/conversationRoutes.js'
+import path from 'path';
 
 /* DIRECTORY AND ENVIRONMENT SETUP */
 const __filename = fileURLToPath(import.meta.url);
@@ -42,8 +43,8 @@ const app = express();                                          // Create instan
 // Configure CORS for different environment
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-  ? ['https://calming-echo-web.onrender.com']
-  : ['http://localhost:5173', 'http://localhost:4173'],
+    ? true // Allow same-origin requests
+    : ['http://localhost:5173', 'http://localhost:4173'],
   credentials: true,
   optionsSuccessStatus: 200
 }
@@ -68,6 +69,8 @@ try {
 } catch (error) {
   console.error('Error encountered while initializing Gemini API client:', error.message);
 }
+
+
 
 /* API ENDPOINTS */
 // Health check
@@ -218,6 +221,17 @@ app.get('/api/db-test', (req, res) => {
 app.use('/api', authRoutes);
 // Conversation routes
 app.use('/api', conversationRoutes)
+
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React build
+  const clientBuildPath = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientBuildPath));
+  
+  // For any request not handled by the API, send the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Start express server to listen on port 3001
 const PORT = process.env.PORT || 3001;

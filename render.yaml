@@ -1,13 +1,11 @@
 services:
-  # Backend API service
+  # Single service deployment
   - type: web
-    name: calming-echo-api
+    name: calming-echo
     env: node
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
+    buildCommand: npm install && npm run build:client
+    startCommand: npm start
     envVars:
-      - key: PORT
-        value: 3001
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
@@ -16,16 +14,3 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
-
-  # Frontend web service
-  - type: web
-    name: calming-echo-web
-    env: node
-    buildCommand: cd client && npm install && npm run build
-    startCommand: cd client && npm run preview
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          name: calming-echo-api
-          type: web
-          property: host
