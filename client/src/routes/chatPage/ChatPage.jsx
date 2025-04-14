@@ -14,20 +14,20 @@ const ChatPage = () => {
             try {
                 const token = localStorage.getItem('token');
 
-                // const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryByUser}`, {
-                //     method: 'GET',
-                //     headers: {
-                //         'Authorization': `Bearer ${token}`,
-                //         'Content-Type': 'application/json',
-                //     }
-                // });
-                const response = await fetch('http://localhost:3001/api/pullHistoryByUser', {
+                const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryByUser}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     }
                 });
+                // const response = await fetch('http://localhost:3001/api/pullHistoryByUser', {
+                //     method: 'GET',
+                //     headers: {
+                //         'Authorization': `Bearer ${token}`,
+                //         'Content-Type': 'application/json',
+                //     }
+                // });
                 if (!response.ok) throw new Error('Failed to fetch history');
 
                 const data = await response.json();
@@ -45,21 +45,21 @@ const ChatPage = () => {
             localStorage.setItem('conversation', conversationId);
             const token = localStorage.getItem('token');
 
-            // const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryById(conversationId)}`, {
-            //     method: 'GET',
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     }
-            // });
-
-            const response = await fetch(`http://localhost:3001/api/pullHistoryById/${conversationId}`, {
+            const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.pullHistoryById(conversationId)}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 }
             });
+
+            // const response = await fetch(`http://localhost:3001/api/pullHistoryById/${conversationId}`, {
+            //     method: 'GET',
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`,
+            //         'Content-Type': 'application/json',
+            //     }
+            // });
 
             if (!response.ok) throw new Error('Failed to fetch conversation');
 
@@ -93,17 +93,17 @@ const ChatPage = () => {
         setMessage(""); // Clears input field
 
         try {
-            // const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.activeListener}`, {
-            //     method: 'POST',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({ message, history, isUser: true }),
-            // });
-
-            const response = await fetch('http://localhost:3001/api/active-listener', {
+            const response = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.activeListener}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message, history, isUser: true }),
             });
+
+            // const response = await fetch('http://localhost:3001/api/active-listener', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ message, history, isUser: true }),
+            // });
 
             if (!response.ok) throw new Error('Network response was not ok');
 
@@ -115,19 +115,7 @@ const ChatPage = () => {
                 reply
             ]);
 
-            // const saveUserHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //         sender: 'user', 
-            //         message: message, 
-            //         conversationId: conversationId
-            //     }),
-            // });
-            const saveUserHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            const saveUserHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -139,6 +127,18 @@ const ChatPage = () => {
                     conversationId: conversationId
                 }),
             });
+            // const saveUserHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`,
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         sender: 'user', 
+            //         message: message, 
+            //         conversationId: conversationId
+            //     }),
+            // });
 
             const saveUserHistory = await saveUserHistoryResponse.json();
             console.log("HERE IS THE SAVED USER CONVERSAION " + JSON.stringify(saveUserHistory));
@@ -146,19 +146,7 @@ const ChatPage = () => {
                 conversationId = saveUserHistory._id;
             }
 
-            // const saveBotHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Authorization': `Bearer ${token}`,
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({
-            //         sender: 'bot', 
-            //         message: reply.summary + "\n" + reply.question,  
-            //         conversationId: conversationId
-            //     }),
-            // });
-            const saveBotHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            const saveBotHistoryResponse = await fetch(`${apiConfig.baseURL}${apiConfig.endpoints.saveToHistory}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -170,6 +158,18 @@ const ChatPage = () => {
                     conversationId: conversationId
                 }),
             });
+            // const saveBotHistoryResponse = await fetch('http://localhost:3001/api/saveToHistory', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`,
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({
+            //         sender: 'bot', 
+            //         message: reply.summary + "\n" + reply.question,  
+            //         conversationId: conversationId
+            //     }),
+            // });
             
         } catch (error) {
             console.error('Error during fetch request:', error);
